@@ -62,6 +62,13 @@ async function run() {
             res.json(result);
         });
 
+        app.delete('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productsCollection.deleteOne(query);
+            res.send(result);
+        });
+
         //UPDATE status
         app.put('/updateOrder', async (req, res) => {
             const id = req.body.id;
@@ -129,12 +136,11 @@ async function run() {
 
         app.put('/users', async (req, res) => {
             const user = req.body;
-            console.log('put', user);
             const filter = { email: user.email };
             const options = { upsert: true };
-            const updateDoc = { $set: user };
-            const result = await usersCollection.updateOne(filter, options, updateDoc);
-            res.json(result);
+            const updatedDoc = { $set: user }
+            const result = await usersCollection.updateOne(filter, updatedDoc, options);
+            res.json(result)
         })
 
         app.put('/users/admin', verifyToken, async (req, res) => {
