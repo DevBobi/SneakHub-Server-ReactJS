@@ -21,8 +21,9 @@ async function run() {
         const database = client.db('sneak_Hub');
         const productsCollection = database.collection('products');
         const ordersCollection = database.collection('orders');
+        const usersCollection = database.collection('users');
 
-        //    GET Products
+        // GET Products
         app.get('/products', async (req, res) => {
             const cursor = productsCollection.find({});
             const products = await cursor.toArray();
@@ -60,7 +61,7 @@ async function run() {
             const result = await ordersCollection.deleteOne(query);
             console.log('deleting order with id ', id)
             res.send(result);
-        })
+        });
 
         // GET All Orders
         app.get('/allorders', async (req, res) => {
@@ -68,7 +69,7 @@ async function run() {
             const cursor = ordersCollection.find({});
             const allOrders = await cursor.toArray();
             res.send(allOrders);
-        })
+        });
         // GET My Orders
         app.get('/myorders', async (req, res) => {
             const email = req.query.email;
@@ -76,7 +77,7 @@ async function run() {
             const cursor = ordersCollection.find(query);
             const orders = await cursor.toArray();
             res.send(orders);
-        })
+        });
 
         // POST orders 
         app.post('/orders', async (req, res) => {
@@ -84,7 +85,25 @@ async function run() {
             const result = await ordersCollection.insertOne(order);
             console.log(order);
             res.json(result)
+        });
+
+        // POST User API
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+            res.json(result)
+        });
+
+        // Upsert Users to db
+        app.put('/users', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const options = { upsert: true };
+            const updateDoc = { $set: user };
+            const result = await usersCollection.updateOne(filter, options, updateDoc);
+            res.json(result);
         })
+
     }
     finally {
         // await client.close();
