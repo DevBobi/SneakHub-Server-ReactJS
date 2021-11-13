@@ -44,6 +44,7 @@ async function run() {
         const productsCollection = database.collection('products');
         const ordersCollection = database.collection('orders');
         const usersCollection = database.collection('users');
+        const reviewCollection = database.collection('reviews');
 
         // GET Products
         app.get('/products', async (req, res) => {
@@ -55,8 +56,6 @@ async function run() {
         // POST products
         app.post('/products', async (req, res) => {
             const product = req.body;
-            console.log('hit the post api', product);
-
             const result = await productsCollection.insertOne(product);
             console.log(result);
             res.json(result);
@@ -112,7 +111,6 @@ async function run() {
         app.post('/orders', async (req, res) => {
             const order = req.body;
             const result = await ordersCollection.insertOne(order);
-            console.log(order);
             res.json(result)
         });
 
@@ -161,6 +159,20 @@ async function run() {
 
         })
 
+        // POST review
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            console.log(result);
+            res.json(result);
+        });
+
+        // GET review
+        app.get('/reviews', async (req, res) => {
+            const cursor = reviewCollection.find({});
+            const review = await cursor.toArray();
+            res.send(review)
+        })
     }
     finally {
         // await client.close();
